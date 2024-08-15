@@ -2,6 +2,6 @@ server:
   port: 5503
   host: localhost
 auth:
-  jwksUri: http://localhost:5501/.well-known/jwks.json
+  jwksUri: http://localhost:8000/api/auth/.well-known/jwks.json
 database:
   url: mongodb://localhost:27017/order?authSource=admin&w=1
