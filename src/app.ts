@@ -8,7 +8,10 @@ import couponRouter from "./coupon/couponRouter";
 const app = express();
 
  // Use CORS middleware
- app.use(cors());
+ app.use(cors({
+  origin:["http://localhost:8000"],
+  credentials: true
+}));
 
 app.use(cookieParser());
 app.use(express.json());
