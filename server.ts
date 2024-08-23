@@ -15,7 +15,7 @@ const startServer = async () => {
 
     broker = createMessageBroker();
     await broker.connectConsumer();
-    await broker.consumeMessage(["product"], false);
+    await broker.consumeMessage(["product", "topping"], false);
 
     app
       .listen(PORT, () => console.log(`Listening on port ${PORT}`))
