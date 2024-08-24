@@ -33,7 +33,14 @@ export class OrderController {
 
     const discountAmount = Math.round((totalPrice * discountPercentage) / 100);
 
-    return res.json({ totalPrice: discountAmount });
+    const priceAfterDiscount = totalPrice - discountAmount;
+
+    // todo: May be store in db for each tenant.
+    const TAXES_PERCENT = 18;
+
+    const taxes = Math.round((priceAfterDiscount * TAXES_PERCENT) / 100);
+
+    return res.json({ taxes: taxes });
   };
 
   private getDiscountPercentage = async (
