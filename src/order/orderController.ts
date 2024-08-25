@@ -8,21 +8,31 @@ import {
 import productCacheModel from "../productCache/productCacheModel";
 import toppingCacheModel from "../toppingCache/toppingCacheModel";
 import couponModel from "../coupon/couponModel";
+import orderModel from "./orderModel";
+import { OrderStatus, PaymentStatus } from "./orderTypes";
 
 export class OrderController {
   create = async (req: Request, res: Response) => {
+
+    const {
+      cart,
+      couponCode,
+      tenantId,
+      paymentMode,
+      customerId,
+      comment,
+      address,
+    } = req.body;
+
     // todo: validate request data.
 
     // console.log("req info -> ", req.body);
 
     // await this.gcalculateTotal(req.body.cart);
 
-    const totalPrice = await this.calculateTotal(req.body.cart);
+    const totalPrice = await this.calculateTotal(cart);
 
     let discountPercentage = 0;
-
-    const couponCode = req.body.couponCode;
-    const tenantId = req.body.tenantId;
 
     if (couponCode) {
       discountPercentage = await this.getDiscountPercentage(
@@ -45,7 +55,22 @@ export class OrderController {
 
     const finalTotal = priceAfterDiscount + taxes + DELIVERY_CHARGES;
 
-    return res.json({ finalTotal: finalTotal });
+    const newOrder = await orderModel.create({
+      cart,
+      address,
+      comment,
+      customerId,
+      deliveryCharges: DELIVERY_CHARGES,
+      discount: discountAmount,
+      taxes,
+      tenantId,
+      total: finalTotal,
+      paymentMode,
+      orderStatus: OrderStatus.RECEIVED,
+      paymentStatus: PaymentStatus.PENDING,
+    });
+
+    return res.json({ newOrder: newOrder });
   };
 
   private getDiscountPercentage = async (
