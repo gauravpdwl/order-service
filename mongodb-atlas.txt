@@ -1,0 +1,5 @@
+XeLVXGbeppDn7PUP
+gauravpadwal48
+
+//stripe setup
+    add secret key in config file from project
