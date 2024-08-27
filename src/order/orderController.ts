@@ -9,7 +9,7 @@ import productCacheModel from "../productCache/productCacheModel";
 import toppingCacheModel from "../toppingCache/toppingCacheModel";
 import couponModel from "../coupon/couponModel";
 import orderModel from "./orderModel";
-import { OrderStatus, PaymentStatus } from "./orderTypes";
+import { OrderStatus, PaymentMode, PaymentStatus } from "./orderTypes";
 import mongoose from "mongoose";
 import idempotencyModel from "../idempotency/idempotencyModel";
 import createHttpError from "http-errors";
@@ -111,17 +111,20 @@ export class OrderController {
 
      // todo: Error handling...
     // todo: add logging
-    const session = await this.paymentGw.createSession({
-      amount: finalTotal,
-      orderId: newOrder[0]._id.toString(),
-      tenantId: tenantId,
-      currency: "inr",
-      idempotenencyKey: idempotencyKey as string,
-    });
+    if (paymentMode === PaymentMode.CARD) {
+      const session = await this.paymentGw.createSession({
+        amount: finalTotal,
+        orderId: newOrder[0]._id.toString(),
+        tenantId: tenantId,
+        currency: "inr",
+        idempotenencyKey: idempotencyKey as string,
+      });
+      return res.json({ paymentUrl: session.paymentUrl });
+    }
 
     // todo: Update order document -> paymentId -> sessionId
 
-    return res.json({ paymentUrl: session.paymentUrl });
+    return res.json({ paymentUrl: null });
   };
 
   private getDiscountPercentage = async (
