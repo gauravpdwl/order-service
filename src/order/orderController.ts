@@ -13,8 +13,12 @@ import { OrderStatus, PaymentStatus } from "./orderTypes";
 import mongoose from "mongoose";
 import idempotencyModel from "../idempotency/idempotencyModel";
 import createHttpError from "http-errors";
+import { PaymentGW } from "../payment/paymentTypes";
 
 export class OrderController {
+
+  constructor(private paymentGw: PaymentGW) {}
+
   create = async (req: Request, res: Response, next: NextFunction) => {
 
     const {
@@ -105,7 +109,19 @@ export class OrderController {
       }
     }
 
-    return res.json({ newOrder: newOrder });
+     // todo: Error handling...
+    // todo: add logging
+    const session = await this.paymentGw.createSession({
+      amount: finalTotal,
+      orderId: newOrder[0]._id.toString(),
+      tenantId: tenantId,
+      currency: "inr",
+      idempotenencyKey: idempotencyKey as string,
+    });
+
+    // todo: Update order document -> paymentId -> sessionId
+
+    return res.json({ paymentUrl: session.paymentUrl });
   };
 
   private getDiscountPercentage = async (

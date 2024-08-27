@@ -7,3 +7,7 @@ database:
   url: mongodb+srv://gauravpadwal48:XeLVXGbeppDn7PUP@cluster0.xhiek.mongodb.net/order?retryWrites=true&w=majority&appName=Cluster0
 kafka:
   broker: localhost:9092
+stripe:
+  secretKey: sk_test_51PsJqXSDQyff9RqEhYz52pCinGtnwmHWtmxXawWcts5vsogeC0pfNJwktdWDDM6yYMBzKguUbWqDWX2vfpshepyw00jfJBVtZb
+frontend:
+  clientUI: http://localhost:3000
