@@ -3,3 +3,8 @@ gauravpadwal48
 
 //stripe setup
     add secret key in config file from project
+
+//stripe setup for webhook
+install stripe
+stripe login -> allow
+stripe listen --forward-to localhost:8000/api/order/payments/webhook

@@ -12,11 +12,12 @@ export interface PaymentOptions {
     paymentUrl: string;
     paymentStatus: GatewayPaymentStatus;
   }
-  interface CustomMetadata {
+  
+  export interface CustomMetadata {
     orderId: string;
   }
   
-  interface VerifiedSession {
+  export interface VerifiedSession {
     id: string;
     metadata: CustomMetadata;
     paymentStatus: GatewayPaymentStatus;
