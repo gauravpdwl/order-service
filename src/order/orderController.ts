@@ -160,9 +160,23 @@ export class OrderController {
   getSingle = async (req: AuthRequest, res: Response, next: NextFunction) => {
     const orderId = req.params.orderId;
     const { sub: userId, role, tenant: tenantId } = req.auth;
-    console.log("userId", userId, "role: ", role, "tenant", tenantId);
+    
+    const fields = req.query.fields
+      ? req.query.fields.toString().split(",")
+      : []; // ["orderStatus", "paymentStatus"]
 
-    const order = await orderModel.findOne({ _id: orderId });
+    const projection = fields.reduce((acc, field) => {
+      acc[field] = 1;
+      return acc;
+    }, {});
+
+    // {
+    //   orderStatus: 1,
+    //   PaymentStatus: 1,
+    // }
+
+    const order = await orderModel.findOne({ _id: orderId }, projection);
+
     if (!order) {
       return next(createHttpError(400, "Order does not exists."));
     }
