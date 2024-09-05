@@ -168,14 +168,19 @@ export class OrderController {
     const projection = fields.reduce((acc, field) => {
       acc[field] = 1;
       return acc;
-    }, {});
+    }, 
+    {customerId: 1}
+  );
 
     // {
     //   orderStatus: 1,
     //   PaymentStatus: 1,
     // }
 
-    const order = await orderModel.findOne({ _id: orderId }, projection);
+    const order = await orderModel
+      .findOne({ _id: orderId }, projection)
+      .populate("customerId")
+      .exec();
 
     if (!order) {
       return next(createHttpError(400, "Order does not exists."));
@@ -198,7 +203,7 @@ export class OrderController {
         return next(createHttpError(400, "No customer found."));
       }
 
-      if (order.customerId.toString() === customer._id.toString()) {
+      if (order.customerId._id.toString() === customer._id.toString()) {
         return res.json(order);
       }
     }
