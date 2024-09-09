@@ -205,11 +205,11 @@ export class OrderController {
       : []; // ["orderStatus", "paymentStatus"]
 
     const projection = fields.reduce((acc, field) => {
-      acc[field] = 1;
-      return acc;
-    }, 
-    {customerId: 1}
-  );
+        acc[field] = 1;
+        return acc;
+      }, 
+      {customerId: 1}
+    );
 
     // {
     //   orderStatus: 1,
@@ -248,6 +248,41 @@ export class OrderController {
     }
 
     return next(createHttpError(403, "Operation not permitted."));
+  };
+
+  changeStatus = async (
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    const { role, tenant: tenantId } = req.auth;
+    const orderId = req.params.orderId;
+
+    if (role === ROLES.MANAGER || ROLES.ADMIN) {
+      const order = await orderModel.findOne({ _id: orderId });
+      if (!order) {
+        return next(createHttpError(400, "Order not found."));
+      }
+
+      const isMyRestaurantOrder = order.tenantId === tenantId;
+
+      if (role === ROLES.MANAGER && !isMyRestaurantOrder) {
+        return next(createHttpError(403, "Not allowed."));
+      }
+
+      const updatedOrder = await orderModel.findOneAndUpdate(
+        { _id: orderId },
+        // todo: req.body.status <- Put proper validation.
+        { orderStatus: req.body.status },
+        { new: true },
+      );
+
+      // todo: send to kafka
+
+      return res.json({ _id: updatedOrder._id });
+    }
+
+    return next(createHttpError(403, "Not allowed."));
   };
 
   private getDiscountPercentage = async (
